@@ -58,74 +58,73 @@ pygame.init()
 screen = pygame.display.set_mode((800, 400))
 pygame.display.set_caption("Zombie Wave")
 
-# Load animated zombie images
+# Load zombie images
 zombie_front_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_front.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_front2.png').convert_alpha(),
+    pygame.image.load('zombie_front.png').convert_alpha(),
+    pygame.image.load('zombie_front2.png').convert_alpha(),
 ]
 zombie_back_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_back.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_back2.png').convert_alpha(),
+    pygame.image.load('zombie_back.png').convert_alpha(),
+    pygame.image.load('zombie_back2.png').convert_alpha(),
 ]
 zombie_left_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_left.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_left2.png').convert_alpha(),
+    pygame.image.load('zombie_left.png').convert_alpha(),
+    pygame.image.load('zombie_left2.png').convert_alpha(),
 ]
 zombie_right_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_right.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_right2.png').convert_alpha(),
+    pygame.image.load('zombie_right.png').convert_alpha(),
+    pygame.image.load('zombie_right2.png').convert_alpha(),
 ]
 
 zombie2_front_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_front.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_front2.png').convert_alpha(),
+    pygame.image.load('zombie2_front.png').convert_alpha(),
+    pygame.image.load('zombie2_front2.png').convert_alpha(),
 ]
 zombie2_back_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_back.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_back2.png').convert_alpha(),
+    pygame.image.load('zombie2_back.png').convert_alpha(),
+    pygame.image.load('zombie2_back2.png').convert_alpha(),
 ]
 zombie2_left_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_left.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_left2.png').convert_alpha(),
+    pygame.image.load('zombie2_left.png').convert_alpha(),
+    pygame.image.load('zombie2_left2.png').convert_alpha(),
 ]
 zombie2_right_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_right.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_right2.png').convert_alpha(),
+    pygame.image.load('zombie2_right.png').convert_alpha(),
+    pygame.image.load('zombie2_right2.png').convert_alpha(),
 ]
 
 zombie3_front_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_right1.png').convert_alpha(),
+    pygame.image.load('zombie3_right1.png').convert_alpha(),
 ]
 zombie3_back_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_back.png').convert_alpha()
+    pygame.image.load('zombie3_back.png').convert_alpha()
 ]
 zombie3_left_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_left1.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_left2.png').convert_alpha(),
+    pygame.image.load('zombie3_left1.png').convert_alpha(),
+    pygame.image.load('zombie3_left2.png').convert_alpha(),
 ]
 zombie3_right_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_right1.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_right2.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_right3.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_right4.png').convert_alpha(),
+    pygame.image.load('zombie3_right1.png').convert_alpha(),
+    pygame.image.load('zombie3_right2.png').convert_alpha(),
+    pygame.image.load('zombie3_right3.png').convert_alpha(),
+    pygame.image.load('zombie3_right4.png').convert_alpha(),
 ]
 
 zombie4_front_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_front.png').convert_alpha(),
+    pygame.image.load('zombie4_front.png').convert_alpha(),
 ]
 zombie4_back_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_back2.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_back3.png').convert_alpha(),
+    pygame.image.load('zombie4_back2.png').convert_alpha(),
+    pygame.image.load('zombie4_back3.png').convert_alpha(),
 ]
 zombie4_left_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_left.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_left2.png').convert_alpha(),
+    pygame.image.load('zombie4_left.png').convert_alpha(),
+    pygame.image.load('zombie4_left2.png').convert_alpha(),
 ]
 zombie4_right_images = [
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_right.png').convert_alpha(),
-    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_right2.png').convert_alpha(),
+    pygame.image.load('zombie4_right.png').convert_alpha(),
+    pygame.image.load('zombie4_right2.png').convert_alpha(),
 ]
-
 
 # Scale images
 def scale_images(images, size):
@@ -180,7 +179,7 @@ zombie4_images = {
     'right': zombie4_right_images
 }
 
-player_image = pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\user.png').convert_alpha()
+player_image = pygame.image.load('user.png').convert_alpha()
 player_image = pygame.transform.scale(player_image, (40, 40))
 
 # Create player
