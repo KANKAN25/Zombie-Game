@@ -248,6 +248,31 @@ def draw_lives(screen, lives, heart_image):
 current_health = MAX_HEALTH
 current_lives = LIVES
 
+
+# Add this at the beginning to load the menu image
+menu_image = pygame.image.load("menu.png")
+menu_image = pygame.transform.scale(menu_image, (WIDTH, HEIGHT))
+
+# Add a boolean variable to track the game state
+in_menu = True
+
+# Load the play and quit buttons
+play_button = pygame.image.load("play.png")
+quit_button = pygame.image.load("quit.png")
+
+# Scale the buttons if necessary
+button_width = 200
+button_height = 50
+play_button = pygame.transform.scale(play_button, (button_width, button_height))
+quit_button = pygame.transform.scale(quit_button, (button_width+50, button_height+50))
+print(quit_button)
+
+# Position the buttons on the menu screen
+play_button_x = (WIDTH - button_width) // 2
+play_button_y = HEIGHT // 2 - 50
+quit_button_x = (WIDTH - button_width) // 2
+quit_button_y = HEIGHT // 2 + 50
+
 # Main game loop
 running = True
 clock = pygame.time.Clock()
@@ -260,8 +285,25 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        for slider in sliders:
-            slider.handle_event(event)
+        if in_menu:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                # Check if the play button is clicked
+                if play_button_x <= mouse_x <= play_button_x + button_width and play_button_y <= mouse_y <= play_button_y + button_height:
+                    in_menu = False  # Start the game
+                # Check if the quit button is clicked
+                elif quit_button_x <= mouse_x <= quit_button_x + button_width and quit_button_y <= mouse_y <= quit_button_y + button_height:
+                    running = False  # Quit the game
+
+
+    if in_menu:
+        # Display the menu image
+        screen.blit(menu_image, (0, 0))
+        # Update the display
+        screen.blit(play_button, (play_button_x, play_button_y))
+        screen.blit(quit_button, (quit_button_x, quit_button_y))
+        pygame.display.flip()
+        continue  # Skip the rest of the game loop if in the menu state
 
     keys = pygame.key.get_pressed()
     move_direction = None
