@@ -2,10 +2,11 @@ import pygame
 import random
 import math
 
-def create_wave(num_zombies, zombie_image, zombie_image_2, zombie_image_3):
+def create_wave(num_zombies, zombie_images, zombie_images_2, zombie_images_4, zombie_images_3):
     zombies = []
+    directions = ['front', 'back', 'left', 'right']
     for _ in range(num_zombies):
-        zombie_rect = zombie_image.get_rect()
+        zombie_rect = zombie_images['front'][0].get_rect()
         edge = random.choice(['top', 'bottom', 'left', 'right'])
 
         if edge == 'top':
@@ -21,11 +22,17 @@ def create_wave(num_zombies, zombie_image, zombie_image_2, zombie_image_3):
             zombie_rect.x = 850
             zombie_rect.y = random.randint(0, 400)
 
-        # Randomly select one of the zombie images and set health accordingly
-        zombie_image_choice = random.choice([(zombie_image, 25), (zombie_image_2, 40), (zombie_image_3, 65)])
-        chosen_image, health = zombie_image_choice
+        zombie_image_choice = random.choice([(zombie_images, 25), (zombie_images_2, 40), (zombie_images_4, 50), (zombie_images_3, 65)])
+        chosen_images, health = zombie_image_choice
+        direction = random.choice(directions)
 
-        zombies.append({'rect': zombie_rect, 'health': health, 'max_health': health, 'image': chosen_image})  # Add health and image to each zombie
+        zombies.append({
+            'rect': zombie_rect,
+            'health': health,
+            'max_health': health,
+            'images': chosen_images,
+            'direction': direction
+        })
     return zombies
 
 # Function to calculate the offset for zombie movement
@@ -51,17 +58,130 @@ pygame.init()
 screen = pygame.display.set_mode((800, 400))
 pygame.display.set_caption("Zombie Wave")
 
-# Load images
-zombie_image = pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\graphics\nicole.png').convert_alpha()
-zombie_image_2 = pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\graphics\nicole2.png').convert_alpha()
-zombie_image_3 = pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\graphics\nicole3.png').convert_alpha()
-player_image = pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\graphics\user.png').convert_alpha()
+# Load animated zombie images
+zombie_front_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_front.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_front2.png').convert_alpha(),
+]
+zombie_back_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_back.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_back2.png').convert_alpha(),
+]
+zombie_left_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_left.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_left2.png').convert_alpha(),
+]
+zombie_right_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_right.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie_right2.png').convert_alpha(),
+]
+
+zombie2_front_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_front.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_front2.png').convert_alpha(),
+]
+zombie2_back_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_back.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_back2.png').convert_alpha(),
+]
+zombie2_left_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_left.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_left2.png').convert_alpha(),
+]
+zombie2_right_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_right.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie2_right2.png').convert_alpha(),
+]
+
+zombie3_front_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_right1.png').convert_alpha(),
+]
+zombie3_back_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_back.png').convert_alpha()
+]
+zombie3_left_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_left1.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_left2.png').convert_alpha(),
+]
+zombie3_right_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_right1.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_right2.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_right3.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie3_right4.png').convert_alpha(),
+]
+
+zombie4_front_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_front.png').convert_alpha(),
+]
+zombie4_back_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_back2.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_back3.png').convert_alpha(),
+]
+zombie4_left_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_left.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_left2.png').convert_alpha(),
+]
+zombie4_right_images = [
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_right.png').convert_alpha(),
+    pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\zombie4_right2.png').convert_alpha(),
+]
+
 
 # Scale images
-zombie_image = pygame.transform.scale(zombie_image, (40, 40))  # Adjust size as needed
-zombie_image_2 = pygame.transform.scale(zombie_image_2, (40, 40))  # Adjust size as needed
-zombie_image_3 = pygame.transform.scale(zombie_image_3, (40, 40))  # Adjust size as needed
-player_image = pygame.transform.scale(player_image, (40, 40))  # Adjust size as needed
+def scale_images(images, size):
+    return [pygame.transform.scale(image, size) for image in images]
+
+zombie_front_images = scale_images(zombie_front_images, (40, 40))
+zombie_back_images = scale_images(zombie_back_images, (40, 40))
+zombie_left_images = scale_images(zombie_left_images, (40, 40))
+zombie_right_images = scale_images(zombie_right_images, (40, 40))
+
+zombie2_front_images = scale_images(zombie2_front_images, (40, 40))
+zombie2_back_images = scale_images(zombie2_back_images, (40, 40))
+zombie2_left_images = scale_images(zombie2_left_images, (40, 40))
+zombie2_right_images = scale_images(zombie2_right_images, (40, 40))
+
+zombie3_front_images = scale_images(zombie3_front_images, (80, 80))
+zombie3_back_images = scale_images(zombie3_back_images, (80, 80))
+zombie3_left_images = scale_images(zombie3_left_images, (80, 80))
+zombie3_right_images = scale_images(zombie3_right_images, (80, 80))
+
+zombie4_front_images = scale_images(zombie4_front_images, (40, 40))
+zombie4_back_images = scale_images(zombie4_back_images, (40, 40))
+zombie4_left_images = scale_images(zombie4_left_images, (40, 40))
+zombie4_right_images = scale_images(zombie4_right_images, (40, 40))
+
+
+zombie_images = {
+    'front': zombie_front_images,
+    'back': zombie_back_images,
+    'left': zombie_left_images,
+    'right': zombie_right_images
+}
+
+zombie2_images = {
+    'front': zombie2_front_images,
+    'back': zombie2_back_images,
+    'left': zombie2_left_images,
+    'right': zombie2_right_images
+}
+
+zombie3_images = {
+    'front': zombie3_front_images,
+    'back': zombie3_back_images,
+    'left': zombie3_left_images,
+    'right': zombie3_right_images
+}
+
+zombie4_images = {
+    'front': zombie4_front_images,
+    'back': zombie4_back_images,
+    'left': zombie4_left_images,
+    'right': zombie4_right_images
+}
+
+player_image = pygame.image.load(r'C:\Users\hp\OneDrive\Documents\cmsc21\Pygame\Zombies\Zombie-Game\graphics\user.png').convert_alpha()
+player_image = pygame.transform.scale(player_image, (40, 40))
 
 # Create player
 player_rect = player_image.get_rect()
@@ -69,20 +189,27 @@ player_rect.center = (400, 200)  # Start at the center of the screen
 
 # Game state variables
 level = 1
-base_num_zombies = 5  # Base number of zombies for level 1
-zombies = create_wave(base_num_zombies * level, zombie_image, zombie_image_2, zombie_image_3)
+base_num_zombies = 5  # Base number of zombies
+zombies = create_wave(base_num_zombies * level, zombie_images, zombie2_images, zombie4_images, zombie3_images)
 
 # Main game loop
 running = True
 clock = pygame.time.Clock()
-player_speed = 2.3  # Speed of the player
-zombie_speed_factor = 0.7  # Factor to reduce zombie speed
+player_speed = 1.3  # Speed of the player
+zombie_speed = 0.56  # Speed of the zombies
+frame_count = 0
 
-# Game over flag
+# Game over
 game_over = False
 
 # Fonts
 font = pygame.font.Font(None, 18)
+
+def get_zombie_image(zombie_info, frame_count):
+    direction = zombie_info['direction']
+    images = zombie_info['images'][direction]
+    index = (frame_count // 20) % len(images)  # Animation speed of the zombies
+    return images[index]
 
 while running:
     for event in pygame.event.get():
@@ -122,8 +249,20 @@ while running:
                 dy /= distance
             
             # Adjust the direction vector to always point towards the player
-            dx *= zombie_speed_factor
-            dy *= zombie_speed_factor
+            dx *= zombie_speed 
+            dy *= zombie_speed 
+
+            # Determine the direction of the zombie
+            if abs(dx) > abs(dy):
+                if dx > 0:
+                    zombie_info['direction'] = 'right'
+                else:
+                    zombie_info['direction'] = 'left'
+            else:
+                if dy > 0:
+                    zombie_info['direction'] = 'front'
+                else:
+                    zombie_info['direction'] = 'back'
 
             # Add a small random component to avoid perfect diagonals
             epsilon = 0.1
@@ -150,7 +289,7 @@ while running:
         # Check if all zombies are eliminated
         if all(zombie['health'] <= 0 for zombie in zombies):
             level += 1
-            zombies = create_wave(base_num_zombies * level, zombie_image, zombie_image_2, zombie_image_3)
+            zombies = create_wave(base_num_zombies * level, zombie_images, zombie2_images, zombie3_images)
 
     # Clear the screen
     screen.fill((30, 30, 30))
@@ -163,30 +302,30 @@ while running:
         zombie_rect = zombie_info['rect']
         zombie_health = zombie_info['health']
         max_health = zombie_info['max_health']
-        zombie_image = zombie_info['image']  # Get the zombie image
         
         # Draw health bar
         bar_width = 40  # Width of the health bar
         health_bar_width = int((zombie_health / max_health) * bar_width)  # Calculate the width based on health percentage
-        pygame.draw.rect(screen, (255, 0, 0), (zombie_rect.x, zombie_rect.y - 5, bar_width, 3))  # Red bar
-        pygame.draw.rect(screen, (0, 255, 0), (zombie_rect.x, zombie_rect.y - 5, health_bar_width, 3))  # Green bar based on health
+        pygame.draw.rect(screen, (255, 0, 0), (zombie_rect.x, zombie_rect.y - 5, bar_width, 3))  # Red bar for damage
+        pygame.draw.rect(screen, (0, 255, 0), (zombie_rect.x, zombie_rect.y - 5, health_bar_width, 3))  # Green bar for health
 
-        
         # Draw number of health and damage
         health_text = font.render(f'{zombie_health}/{max_health}', True, (255, 255, 255))
         screen.blit(health_text, (zombie_rect.x + 45, zombie_rect.y - 5))
 
         # Draw zombie
+        zombie_image = get_zombie_image(zombie_info, frame_count)
         screen.blit(zombie_image, zombie_rect)
 
     # If game over, display a game over message
     if game_over:
-        font = pygame.font.Font(None, 24)
+        font = pygame.font.Font(None, 48)
         text = font.render('Game Over', True, (255, 0, 0))
         screen.blit(text, (250, 150))
 
     # Update the display
     pygame.display.flip()
+    frame_count += 1
 
     # Cap the frame rate
     clock.tick(60)
