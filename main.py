@@ -22,8 +22,8 @@ DARK_GRAY = (150, 150, 150)
 GREEN = (0, 128, 0)
 
 # Define colors for the gradient
-horizon_color = (25, 127, 127) # Orange
-sky_color = (255, 165, 0)    # Orange
+horizon_color = (25, 127, 127)  # Orange
+sky_color = (255, 165, 0)       # Orange
 
 # Default circle parameters
 default_radius = 100
@@ -99,7 +99,6 @@ class Slider:
     def get_tangential_acc(self):
         return self.tangential_acc
 
-
 class OutputBox:
     def __init__(self, x, y, w, h, text=''):
         self.rect = pygame.Rect(x, y, w, h)
@@ -117,7 +116,7 @@ class OutputBox:
 
 def calculate_centripetal_acceleration(radius, speed):
     if radius == 0:
-        return float('inf')
+                return float('inf')
     else:
         return (speed ** 2) / radius
 
@@ -231,122 +230,57 @@ centripetal_force_output = OutputBox(50, 110, 250, output_box_height, "Centripet
 sliders = [radius_slider, speed_slider, weight_slider]
 output_boxes = [centripetal_acc_output, tangential_acc_output, angular_velocity_output, centripetal_force_output]
 
-def draw_health_bar(screen, x, y, health, max_health):
-    bar_width = 50
-    bar_height = 10
-    fill_width = (health / max_health) * bar_width
-    outline_rect = pygame.Rect(x - bar_width // 2, y - bar_height - 10, bar_width, bar_height)
-    fill_rect = pygame.Rect(x - bar_width // 2, y - bar_height - 10, fill_width, bar_height)
-    pygame.draw.rect(screen, GREEN, fill_rect)
-    pygame.draw.rect(screen, BLACK, outline_rect, 2)
-
-def draw_lives(screen, lives, heart_image):
-    for i in range(lives):
-        screen.blit(heart_image, (2 * COLUMN_WIDTH + 100 + i * (heart_image.get_width() + 10), 60))
-
-# Variables for health and lives
-current_health = MAX_HEALTH
-current_lives = LIVES
-
-
-# Add this at the beginning to load the menu image
-menu_image = pygame.image.load("menu.png")
-menu_image = pygame.transform.scale(menu_image, (WIDTH, HEIGHT))
-
-# Add a boolean variable to track the game state
-in_menu = True
-
-# Load the play and quit buttons
-play_button = pygame.image.load("play.png")
-quit_button = pygame.image.load("quit.png")
-
-# Scale the buttons if necessary
-button_width = 200
-button_height = 50
-play_button = pygame.transform.scale(play_button, (button_width, button_height))
-quit_button = pygame.transform.scale(quit_button, (button_width+50, button_height+50))
-print(quit_button)
-
-# Position the buttons on the menu screen
-play_button_x = (WIDTH - button_width) // 2
-play_button_y = HEIGHT // 2 - 50
-quit_button_x = (WIDTH - button_width) // 2
-quit_button_y = HEIGHT // 2 + 50
+# Define initial position and size of the character's rect
+character_rect = character_image.get_rect(center=(center_x, center_y))
 
 # Main game loop
-running = True
-clock = pygame.time.Clock()
-angle = 0
-radius = default_radius
-speed = default_speed
-weight = default_weight
-
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if in_menu:
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_x, mouse_y = pygame.mouse.get_pos()
-                # Check if the play button is clicked
-                if play_button_x <= mouse_x <= play_button_x + button_width and play_button_y <= mouse_y <= play_button_y + button_height:
-                    in_menu = False  # Start the game
-                # Check if the quit button is clicked
-                elif quit_button_x <= mouse_x <= quit_button_x + button_width and quit_button_y <= mouse_y <= quit_button_y + button_height:
-                    running = False  # Quit the game
-
-
-    if in_menu:
-        # Display the menu image
-        screen.blit(menu_image, (0, 0))
-        # Update the display
-        screen.blit(play_button, (play_button_x, play_button_y))
-        screen.blit(quit_button, (quit_button_x, quit_button_y))
-        pygame.display.flip()
-        continue  # Skip the rest of the game loop if in the menu state
+        for slider in sliders:
+            slider.handle_event(event)
 
     keys = pygame.key.get_pressed()
-    move_direction = None
+    move_direction = (0, 0)  # Initialize movement direction
 
     # Determine movement direction
     if keys[pygame.K_UP] or keys[pygame.K_w]:
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            move_direction = "northwest"
-        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            move_direction = "northeast"
+        move_direction = (move_direction[0], -move_speed)
+    if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+        move_direction = (move_direction[0], move_speed)
+    if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        move_direction = (-move_speed, move_direction[1])
+    if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        move_direction = (move_speed, move_direction[1])
+
+    # Update character's rect position based on movement direction
+    character_rect.move_ip(move_direction)
+
+    # Clamp character's rect within screen boundaries
+    character_rect.clamp_ip(pygame.Rect(-50, TOP_HEIGHT - 60, WIDTH + 115, HEIGHT - TOP_HEIGHT + 115))
+
+    # Determine the direction the character is facing
+    if move_direction[1] < 0:
+        if move_direction[0] == 0:
+            character_image = direction_images["north"]
+        elif move_direction[0] < 0:
+            character_image = direction_images["northwest"]
         else:
-            move_direction = "north"
-    elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            move_direction = "southwest"
-        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            move_direction = "southeast"
+            character_image = direction_images["northeast"]
+    elif move_direction[1] > 0:
+        if move_direction[0] == 0:
+            character_image = direction_images["south"]
+        elif move_direction[0] < 0:
+            character_image = direction_images["southwest"]
         else:
-            move_direction = "south"
-    elif keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        move_direction = "west"
-    elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        move_direction = "east"
-
-    # Define boundaries for the character's movement
-    min_x = 0
-    max_x = WIDTH
-    min_y = TOP_HEIGHT
-    max_y = HEIGHT
-
-    # Move the center point based on the direction with boundary checks
-    if move_direction:
-        if "north" in move_direction and center_y - move_speed >= min_y:
-            center_y -= move_speed
-        if "south" in move_direction and center_y + move_speed <= max_y:
-            center_y += move_speed
-        if "west" in move_direction and center_x - move_speed >= min_x:
-            center_x -= move_speed
-        if "east" in move_direction and center_x + move_speed <= max_x:
-            center_x += move_speed
-
-        # Update character's image based on movement direction
-        character_image = direction_images.get(move_direction, character_image)
+            character_image = direction_images["southeast"]
+    elif move_direction[0] < 0:
+        character_image = direction_images["west"]
+    elif move_direction[0] > 0:
+        character_image = direction_images["east"]
+    else:
+        character_image = direction_images["stationary"]
 
     # Get values from sliders
     radius = radius_slider.get_value()
@@ -375,11 +309,12 @@ while running:
     centripetal_force_output.update("Centripetal Force: {:.2f} N".format(centripetal_force))
     angular_velocity_output.update("Angular Velocity: {:.2f} rad/s".format(angular_velocity))
 
+
     # Clear the screen
     screen.fill(WHITE)
 
     # Draw background colors for the top and bottom sections
-   # Define the rectangular area for the gradient
+    # Define the rectangular area for the gradient
     gradient_rect = pygame.Rect(0, 0, WIDTH, 150)
 
     # Draw the sunset gradient within the rectangular area
@@ -393,35 +328,32 @@ while running:
         pygame.draw.line(screen, color, (gradient_rect.left, gradient_rect.top + y),
                          (gradient_rect.right, gradient_rect.top + y))
 
-    
-
     # Draw sliders and output boxes
     for slider in sliders:
         draw_label(slider.label, slider.rect.x, slider.rect.y - 20)
         slider.draw(screen)
         # Draw slider values beside sliders
         if slider == radius_slider:
-            draw_label("{:.2f}".format(slider.get_value() / radius_scale), slider.rect.x + slider.rect.width + 10, slider.rect.y)
+            draw_label("{:.2f}".format(slider.get_value() / radius_scale), slider.rect.x + slider.rect.width + 10,
+                       slider.rect.y)
         elif slider == speed_slider:
-            draw_label("{:.2f}".format(slider.get_value() * speed_scale), slider.rect.x + slider.rect.width + 10, slider.rect.y)
+            draw_label("{:.2f}".format(slider.get_value() * speed_scale), slider.rect.x + slider.rect.width + 10,
+                       slider.rect.y)
         else:
             draw_label("{:.2f}".format(slider.get_value()), slider.rect.x + slider.rect.width + 10, slider.rect.y)
 
-    # Draw character image
-    screen.blit(character_image, (center_x - character_image.get_width() // 2, center_y - character_image.get_height() // 2))
+    # Draw character image based on rect position
+    screen.blit(character_image, character_rect)
 
     # Draw label for lives
     draw_label("LIVES:", 2 * COLUMN_WIDTH + 50, 70)
 
-    # Draw hearts in the top-right section
-    draw_lives(screen, current_lives, heart_image)
-
     # Update angle and draw the scene
     angle += speed
-    draw_scene(radius, angle, center_x, center_y, ball_size, character_image)
+    draw_scene(radius, angle, character_rect.centerx, character_rect.centery, ball_size, character_image)
 
     # Draw health bar on top of the character
-    draw_health_bar(screen, center_x, center_y - 30, current_health, MAX_HEALTH)
+    #draw_health_bar(screen, center_x, center_y - 30, current_health, MAX_HEALTH)
 
     # Draw output boxes
     for output_box in output_boxes:
@@ -431,8 +363,6 @@ while running:
     pygame.display.flip()
     clock.tick(60)
 
-    # Update the display
-    pygame.display.flip()
-    clock.tick(60)
-
 pygame.quit()
+
+
