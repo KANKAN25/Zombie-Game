@@ -116,7 +116,7 @@ class OutputBox:
 
 def calculate_centripetal_acceleration(radius, speed):
     if radius == 0:
-                return float('inf')
+        return float('inf')
     else:
         return (speed ** 2) / radius
 
@@ -129,7 +129,7 @@ def calculate_angular_velocity(speed, radius):
     else:
         return speed / radius
 
-def draw_scene(radius, angle, center_x, center_y, ball_size, character_img):
+def draw_scene(radius, angle, center_x, center_y, ball_image, ball_rect, character_img):
     # Blit the background image for the bottom section
     screen.blit(background_bottom_image, (0, TOP_HEIGHT))
 
@@ -140,8 +140,8 @@ def draw_scene(radius, angle, center_x, center_y, ball_size, character_img):
     # Draw center point
     pygame.draw.circle(screen, BLACK, (center_x, center_y), 5)
 
-    # Draw circle
-    pygame.draw.circle(screen, (34, 40, 49), (int(circle_x), int(circle_y)), ball_size)
+    # Draw the ball image at the calculated position
+    screen.blit(ball_image, (circle_x - ball_rect.width // 2, circle_y - ball_rect.height // 2))
 
     # Draw line connecting center point and circle
     pygame.draw.line(screen, (34, 40, 49), (center_x, center_y), (int(circle_x), int(circle_y)), 2)
@@ -179,12 +179,12 @@ angular_velocity_output = OutputBox(50, 80, 250, output_box_height, "Angular Vel
 output_boxes = [centripetal_acc_output, tangential_acc_output, centripetal_force_output, angular_velocity_output]
 
 # Load the background image for the bottom section
-background_bottom_image = pygame.image.load("background_bottom.png")
+background_bottom_image = pygame.image.load("background_bottom.png").convert()
 background_bottom_image = pygame.transform.scale(background_bottom_image, (WIDTH, BOTTOM_HEIGHT))
 
 # Load the images for character directions
 direction_images = {
-    "stationary": pygame.image.load("main_stationary.png"),
+    "stationary": pygame.image.load("main_stationary.png").convert,
     "north": pygame.image.load("main_moving_north.png"),
     "south": pygame.image.load("main_moving_south.png"),
     "east": pygame.image.load("main_moving_east.png"),
@@ -201,16 +201,6 @@ stationary_image = pygame.transform.scale(direction_images["stationary"], (int(d
 
 for key in direction_images:
     direction_images[key] = pygame.transform.scale(direction_images[key], (stationary_image.get_width(), stationary_image.get_height()))
-
-character_image = direction_images["stationary"]
-
-# Constants for health and lives
-MAX_HEALTH = 100
-LIVES = 3
-
-# Load heart image for lives
-heart_image = pygame.image.load("heart.png")
-heart_image = pygame.transform.scale(heart_image, (30, 30))  # Adjust size if necessary
 
 # Define column widths
 COLUMN_WIDTH = WIDTH // 3
@@ -231,7 +221,17 @@ sliders = [radius_slider, speed_slider, weight_slider]
 output_boxes = [centripetal_acc_output, tangential_acc_output, angular_velocity_output, centripetal_force_output]
 
 # Define initial position and size of the character's rect
-character_rect = character_image.get_rect(center=(center_x, center_y))
+character_rect = stationary_image.get_rect(center=(center_x, center_y))
+
+# Load the image for the ball
+ball_image = pygame.image.load("ball.png")
+
+# Define the initial size of the ball
+initial_ball_size = 50
+
+# Create a rect for the ball image and scale it
+ball_rect = pygame.Rect(0, 0, initial_ball_size, initial_ball_size)
+ball_image = pygame.transform.scale(ball_image, (initial_ball_size, initial_ball_size))
 
 # Main game loop
 while running:
@@ -291,7 +291,7 @@ while running:
     speed_scale = 100
     weight_scale = 1
 
-    ball_size = int(weight * 5)  # Scale the size of the ball based on weight
+    ball_size = int(weight * initial_ball_size)  # Scale the size of the ball based on weight
 
     # Update sliders to reset tangential acceleration if needed
     for slider in sliders:
@@ -345,12 +345,9 @@ while running:
     # Draw character image based on rect position
     screen.blit(character_image, character_rect)
 
-    # Draw label for lives
-    draw_label("LIVES:", 2 * COLUMN_WIDTH + 50, 70)
-
     # Update angle and draw the scene
     angle += speed
-    draw_scene(radius, angle, character_rect.centerx, character_rect.centery, ball_size, character_image)
+    draw_scene(radius, angle, character_rect.centerx, character_rect.centery, ball_image, ball_rect, character_image)
 
     # Draw health bar on top of the character
     #draw_health_bar(screen, center_x, center_y - 30, current_health, MAX_HEALTH)
@@ -364,5 +361,4 @@ while running:
     clock.tick(60)
 
 pygame.quit()
-
 

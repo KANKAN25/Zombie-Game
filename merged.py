@@ -117,7 +117,7 @@ class OutputBox:
 
 def calculate_centripetal_acceleration(radius, speed):
     if radius == 0:
-                return float('inf')
+            return float('inf')
     else:
         return (speed ** 2) / radius
 
@@ -130,7 +130,17 @@ def calculate_angular_velocity(speed, radius):
     else:
         return speed / radius
 
-def draw_scene(radius, angle, center_x, center_y, ball_size, character_img):
+def calculate_angular_acc(tangential_acc, radius):
+    if radius == 0:
+        return float('inf')
+    else:
+        return tangential_acc / radius
+    
+def calculate_net_force(weight, tangential_acc, centripetal_acc):
+    return weight * math.sqrt(tangential_acc**2 + centripetal_acc**2)
+
+
+def draw_scene(radius, angle, center_x, center_y, ball_image, ball_rect, character_img):
     # Blit the background image for the bottom section
     screen.blit(background_bottom_image, (0, TOP_HEIGHT))
 
@@ -141,8 +151,8 @@ def draw_scene(radius, angle, center_x, center_y, ball_size, character_img):
     # Draw center point
     pygame.draw.circle(screen, BLACK, (center_x, center_y), 5)
 
-    # Draw circle
-    pygame.draw.circle(screen, (34, 40, 49), (int(circle_x), int(circle_y)), ball_size)
+    # Draw the ball image at the calculated position
+    screen.blit(ball_image, (circle_x - ball_rect.width // 2, circle_y - ball_rect.height // 2))
 
     # Draw line connecting center point and circle
     pygame.draw.line(screen, (34, 40, 49), (center_x, center_y), (int(circle_x), int(circle_y)), 2)
@@ -171,18 +181,18 @@ def create_wave(num_zombies, zombie_images, zombie_images_2, zombie_images_4, zo
 
         if edge == 'top':
             zombie_rect.x = random.randint(0, 800)
-            zombie_rect.y = -50
+            zombie_rect.y = 150
         elif edge == 'bottom':
             zombie_rect.x = random.randint(0, 800)
             zombie_rect.y = 450
         elif edge == 'left':
             zombie_rect.x = -50
-            zombie_rect.y = random.randint(0, 400)
+            zombie_rect.y = random.randint(150, 400)
         elif edge == 'right':
             zombie_rect.x = 850
-            zombie_rect.y = random.randint(0, 400)
+            zombie_rect.y = random.randint(150, 400)
 
-        zombie_image_choice = random.choice([(zombie_images, 25), (zombie_images_2, 40), (zombie_images_4, 50), (zombie_images_3, 65)])
+        zombie_image_choice = random.choice([(zombie_images, int(random.uniform(1, 400))), (zombie_images_2, int(random.uniform(1, 400))), (zombie_images_4, int(random.uniform(1, 400))), (zombie_images_3, int(random.uniform(1, 400)))])
         chosen_images, health = zombie_image_choice
         direction = random.choice(directions)
 
@@ -369,30 +379,34 @@ weight_slider = Slider(360, 130, 300, 0.5, 5.0, default_weight, "Weight (kg):")
 
 sliders = [radius_slider, speed_slider, weight_slider]
 
-# Create output boxes
 output_box_height = 20
-centripetal_acc_output = OutputBox(50, 20, 250, output_box_height, "Centripetal Acceleration (m/s^2): ")
-tangential_acc_output = OutputBox(50, 50, 250, output_box_height, "Tangential Acceleration (m/s^2): ")
-centripetal_force_output = OutputBox(50, 110, 250, output_box_height, "Centripetal Force (N): ")
-angular_velocity_output = OutputBox(50, 80, 250, output_box_height, "Angular Velocity (rad/s): ")
+# Create output boxes for uniform circular motion
+angular_velocity_output = OutputBox(20, 40, 250, output_box_height, "Angular Velocity (rad/s): ")
+centripetal_acc_output = OutputBox(20, 70, 250, output_box_height, "Centripetal Acceleration (m/s^2): ")
+centripetal_force_output = OutputBox(20, 100, 250, output_box_height, "Centripetal Force (N): ")
 
-output_boxes = [centripetal_acc_output, tangential_acc_output, centripetal_force_output, angular_velocity_output]
+#create ouptut boxes for non uniform circular motion
+angular_acc_output = OutputBox(530, 40, 250, output_box_height, "Angular Acceleration (rad/s): ")
+tangential_acc_output = OutputBox(530, 70, 250, output_box_height, "Tangential Acceleration (m/s^2): ")
+net_force_output = OutputBox(530, 100, 250, output_box_height, "Net Force (N): ")
+
+output_boxes = [angular_velocity_output, centripetal_acc_output, centripetal_force_output, angular_acc_output, tangential_acc_output, net_force_output]
 
 # Load the background image for the bottom section
-background_bottom_image = pygame.image.load("background_bottom.png")
+background_bottom_image = pygame.image.load("background_bottom.png").convert_alpha()
 background_bottom_image = pygame.transform.scale(background_bottom_image, (WIDTH, BOTTOM_HEIGHT))
 
 # Load the images for character directions
 direction_images = {
-    "stationary": pygame.image.load("main_stationary.png"),
-    "north": pygame.image.load("main_moving_north.png"),
-    "south": pygame.image.load("main_moving_south.png"),
-    "east": pygame.image.load("main_moving_east.png"),
-    "west": pygame.image.load("main_moving_west.png"),
-    "northeast": pygame.image.load("main_moving_northeast.png"),
-    "northwest": pygame.image.load("main_moving_northwest.png"),
-    "southeast": pygame.image.load("main_moving_southeast.png"),
-    "southwest": pygame.image.load("main_moving_southwest.png")
+    "stationary": pygame.image.load("main_stationary.png").convert_alpha(),
+    "north": pygame.image.load("main_moving_north.png").convert_alpha(),
+    "south": pygame.image.load("main_moving_south.png").convert_alpha(),
+    "east": pygame.image.load("main_moving_east.png").convert_alpha(),
+    "west": pygame.image.load("main_moving_west.png").convert_alpha(),
+    "northeast": pygame.image.load("main_moving_northeast.png").convert_alpha(),
+    "northwest": pygame.image.load("main_moving_northwest.png").convert_alpha(),
+    "southeast": pygame.image.load("main_moving_southeast.png").convert_alpha(),
+    "southwest": pygame.image.load("main_moving_southwest.png").convert_alpha()
 }
 
 # Scale all direction images to the same size as the stationary image
@@ -408,19 +422,13 @@ character_image = direction_images["stationary"]
 COLUMN_WIDTH = WIDTH // 3
 
 # Create and position sliders
-radius_slider = Slider(COLUMN_WIDTH + 60, 40, 200, 10, 200, default_radius, "Radius:")
-speed_slider = Slider(COLUMN_WIDTH + 60, 80, 200, 0.01, 0.2, default_speed, "Speed:")
-weight_slider = Slider(COLUMN_WIDTH + 60, 120, 200, 0.5, 5.0, default_weight, "Weight (kg):")
+radius_slider = Slider(COLUMN_WIDTH + 17, 40, 200, 10, 200, default_radius, "Radius:")
+speed_slider = Slider(COLUMN_WIDTH + 17, 80, 200, 0.01, 0.2, default_speed, "Speed:")
+weight_slider = Slider(COLUMN_WIDTH + 17, 120, 200, 0.5, 5.0, default_weight, "Weight (kg):")
 
-# Create and position output boxes
-output_box_height = 20
-centripetal_acc_output = OutputBox(50, 20, 250, output_box_height, "Centripetal Acceleration: ")
-tangential_acc_output = OutputBox(50, 50, 250, output_box_height, "Tangential Acceleration: ")
-angular_velocity_output = OutputBox(50, 80, 250, output_box_height, "Angular Velocity: ")
-centripetal_force_output = OutputBox(50, 110, 250, output_box_height, "Centripetal Force: ")
 
 sliders = [radius_slider, speed_slider, weight_slider]
-output_boxes = [centripetal_acc_output, tangential_acc_output, angular_velocity_output, centripetal_force_output]
+
 
 
 
@@ -437,8 +445,18 @@ char_rect_height = 50
 character_rect = pygame.Rect(character_rect.x + char_rect_offsetX, character_rect.y + char_rect_offsetY, char_rect_width, char_rect_height)
 
 # Load heart image for lives
-heart_image = pygame.image.load("heart.png")
+heart_image = pygame.image.load("heart.png").convert_alpha()
 heart_image = pygame.transform.scale(heart_image, (30, 30))  # Adjust size if necessary
+
+# Load the image for the ball
+ball_image = pygame.image.load("ball.png").convert_alpha()
+
+# Define the initial size of the ball
+initial_ball_size = 50
+
+# Create a rect for the ball image and scale it
+ball_rect = pygame.Rect(0, 0, initial_ball_size, initial_ball_size)
+ball_image = pygame.transform.scale(ball_image, (initial_ball_size, initial_ball_size))
 
 # Define constants for health and lives
 MAX_HEALTH = 100
@@ -475,6 +493,26 @@ def handle_damage():
         # Bounce character away from the zombie
         bounce_away()
 
+# Function to bounce the zombie away from the ball
+def bounce_away_from_ball(zombie_rect, ball_rect):
+    # Calculate the direction to bounce away from the ball
+    ball_center_x = ball_rect.centerx
+    ball_center_y = ball_rect.centery
+    zombie_center_x = zombie_rect.centerx
+    zombie_center_y = zombie_rect.centery
+
+    dx = zombie_center_x - ball_center_x
+    dy = zombie_center_y - ball_center_y
+    distance = math.hypot(dx, dy)
+
+    if distance != 0:
+        dx /= distance
+        dy /= distance
+
+    # Bounce the zombie
+    zombie_rect.x += int(dx * bounce_distance)
+    zombie_rect.y += int(dy * bounce_distance)
+
 def bounce_away():
     global character_rect
     # Calculate the direction to bounce away from the zombie
@@ -495,19 +533,63 @@ def bounce_away():
     character_rect.x += int(dx * bounce_distance)
     character_rect.y += int(dy * bounce_distance)
 
+def main_menu():
+    # Load images
+    menu_img = pygame.image.load('menu.png').convert_alpha()
+    play_img = pygame.image.load('play.png').convert_alpha()
+    quit_img = pygame.image.load('quit.png').convert_alpha()
 
-def check_circle_rect_collision(circle_x, circle_y, radius, rect_x, rect_y, rect_width, rect_height):
-    # Find the closest point on the rectangle to the circle's center
-    closest_x = max(rect_x, min(circle_x, rect_x + rect_width))
-    closest_y = max(rect_y, min(circle_y, rect_y + rect_height))
+    menu_img = pygame.transform.scale(menu_img, (WIDTH, HEIGHT))
+    play_img = pygame.transform.scale(play_img, (200, 80))
+    quit_img = pygame.transform.scale(quit_img, (200, 80))
 
-    # Calculate the distance between the circle's center and this closest point
-    distance = math.sqrt((circle_x - closest_x)**2 + (circle_y - closest_y)**2)
+    play_rect = play_img.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
+    quit_rect = quit_img.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+
+    while True:
+        screen.blit(menu_img, (0, 0))
+        screen.blit(play_img, play_rect)
+        screen.blit(quit_img, quit_rect)
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if play_rect.collidepoint(event.pos):
+                    return  # Start the game
+                if quit_rect.collidepoint(event.pos):
+                    pygame.quit()
+                    quit()
+
+def display_winning_page():
+    win1_img = pygame.image.load('win1.png').convert_alpha()
+    win2_img = pygame.image.load('win2.png').convert_alpha()
     
-    # If the distance is less than or equal to the circle's radius, there's a collision
-    return distance <= radius
+    win1_img = pygame.transform.scale(win1_img, (WIDTH, HEIGHT))
+    win2_img = pygame.transform.scale(win2_img, (WIDTH, HEIGHT))
 
+    screen.blit(win1_img, (0, 0))
+    screen.blit(win2_img, (0, 0))
 
+    pygame.display.update()
+    pygame.time.wait(3000)  # Display for 3 seconds
+
+game_won = False 
+
+def display_game_over_page():
+    gameover_img = pygame.image.load('gameover.png').convert_alpha()
+    
+    gameover_img = pygame.transform.scale(gameover_img, (WIDTH, HEIGHT))
+
+    screen.blit(gameover_img, (0, 0))
+
+    pygame.display.update()
+    pygame.time.wait(3000)  # Display for 3 seconds
+
+main_menu()
 # Main game loop
 while running:
     for event in pygame.event.get():
@@ -534,7 +616,7 @@ while running:
         character_rect.move_ip(move_direction)
 
         # Clamp character's rect within screen boundaries
-        character_rect.clamp_ip(pygame.Rect(-50, TOP_HEIGHT - 60, WIDTH + 115, HEIGHT - TOP_HEIGHT + 115))
+        character_rect.clamp_ip(pygame.Rect(-50, TOP_HEIGHT, WIDTH + 115, HEIGHT - TOP_HEIGHT))
 
         # Determine the direction the character is facing
         if move_direction[1] < 0:
@@ -567,7 +649,7 @@ while running:
         speed_scale = 100
         weight_scale = 1
 
-        ball_size = int(weight * 5)  # Scale the size of the ball based on weight
+        ball_size = int(weight * initial_ball_size)
 
         # Update sliders to reset tangential acceleration if needed
         for slider in sliders:
@@ -578,12 +660,18 @@ while running:
         tangential_acc = speed_slider.get_tangential_acc()
         centripetal_force = calculate_centripetal_force(weight * weight_scale, radius / radius_scale, speed * speed_scale)
         angular_velocity = calculate_angular_velocity(speed * speed_scale, radius / radius_scale)
+        angular_acc = calculate_angular_acc(tangential_acc, radius/radius_scale)
+        net_force = calculate_net_force(weight * weight_scale, tangential_acc, centripetal_acc)
 
         # Update output box texts
-        centripetal_acc_output.update("Centripetal Acc: {:.2f} m/s^2".format(centripetal_acc))
-        tangential_acc_output.update("Tangential Acc: {:.2f} m/s^2".format(tangential_acc))
-        centripetal_force_output.update("Centripetal Force: {:.2f} N".format(centripetal_force))
         angular_velocity_output.update("Angular Velocity: {:.2f} rad/s".format(angular_velocity))
+        centripetal_acc_output.update("Centripetal Acc: {:.2f} m/s^2".format(centripetal_acc))
+        centripetal_force_output.update("Centripetal Force: {:.2f} N".format(centripetal_force))
+
+        angular_acc_output.update("Angular Acceleration: {:.2f} rad/s^2".format(angular_acc))
+        tangential_acc_output.update("Tangential Acceleration: {:.2f} m/s^2".format(tangential_acc))
+        net_force_output.update("Net Force: {:.2f} N".format(net_force))
+
 
         # Update the position of each zombie to move towards the player
         for zombie_info in zombies:
@@ -628,28 +716,34 @@ while running:
             zombie_rect.x += dx
             zombie_rect.y += dy
 
-            # Check for collision with the player
-            # Define the collision rectangle with expanded dimensions
-            collision_margin = 10
-            collision_rect = pygame.Rect(character_rect.left - collision_margin, 
-                                        character_rect.top - collision_margin, 
-                                        character_rect.width - 10, 
-                                        character_rect.height)
-            
+            # Check for collision with the ball
+            if ball_rect.colliderect(zombie_rect):
+                # Collision detected, bounce the zombie away from the ball
+                bounce_away_from_ball(zombie_rect, ball_rect)
+                # Skip the rest of the loop iteration to prevent additional movement
+                continue
+
             if character_rect.colliderect(zombie_rect):
                 handle_damage()
-                zombie_rect 
-
+                
         for zombie_info in zombies:
             zombie_rect = zombie_info['rect']
             zombie_health = zombie_info['health']
-            circle_center = (center_x + radius * math.cos(angle), center_y + radius * math.sin(angle))
+
+            # Calculate circle position
+            circle_x = center_x + radius * math.cos(angle)
+            circle_y = center_y + radius * math.sin(angle)
+
+
+            # Update the position of ball_rect
+            ball_rect.x = circle_x - ball_rect.width // 2
+            ball_rect.y = circle_y - ball_rect.height // 2
+
             
-            rect = (zombie_rect.left, zombie_rect.top, zombie_rect.width, zombie_rect.height)
-            
-            if check_circle_rect_collision(circle_center[0], circle_center[1],ball_size, zombie_rect.left, zombie_rect.top, zombie_rect.width, zombie_rect.height):
+            if ball_rect.colliderect(zombie_rect):
                 # Collision detected, decrease zombie's health
-                zombie_info['health'] -= 10  # Adjust the amount of damage as needed
+                if centripetal_force <= zombie_info['max_health']:
+                    zombie_info['health'] -= int(centripetal_force) # Adjust the amount of damage as needed
 
                 # If the zombie's health is 0 or less, remove it
                 if zombie_info['health'] <= 0:
@@ -663,8 +757,9 @@ while running:
                 zombies = create_wave(base_num_zombies * level, zombie_images, zombie2_images, zombie4_images, zombie3_images)
             else:
                 # Game is won
-                print("Congratulations! You have won the game.")
+                display_winning_page()
                 running = False  # End the game loop
+
 
     # Clear the screen
     screen.fill(WHITE)
@@ -698,26 +793,23 @@ while running:
         else:
             draw_label("{:.2f}".format(slider.get_value()), slider.rect.x + slider.rect.width + 10, slider.rect.y)
 
-    # Draw character image based on rect position
-    screen.blit(character_image, character_rect)
-
-    # Draw label for lives
-    draw_label("LIVES:", 2 * COLUMN_WIDTH + 50, 70)
-
     # Update angle and draw the scene
     angle += speed
-    draw_scene(radius, angle, character_rect.centerx, character_rect.centery, ball_size, character_image)
+    draw_scene(radius, angle, character_rect.centerx, character_rect.centery, ball_image, ball_rect, character_image)
 
-    # Draw health bar
-    
+    # Draw health bar above the character
     health_bar_width = int((current_health / MAX_HEALTH) * 100)  # Calculate health bar width
-    print(health_bar_width)
-    pygame.draw.rect(screen, (255, 0, 0), (635, 40, 100, 10))  # Draw red background for health bar
-    pygame.draw.rect(screen, (0, 255, 0), (635, 40, health_bar_width, 10))  # Draw green health bar
+    health_bar_rect = pygame.Rect(character_rect.left, character_rect.top - 20, 100, 10)  # Position the health bar above the character
+    pygame.draw.rect(screen, (255, 0, 0), (health_bar_rect.left, health_bar_rect.top, 100, 10))  # Draw red background for health bar
+    pygame.draw.rect(screen, (0, 255, 0), (health_bar_rect.left, health_bar_rect.top, health_bar_width, 10))  # Draw green health bar
+
 
     # Draw lives display
     for i in range(current_lives):
-        screen.blit(heart_image, (i * 30 + 640, 60))
+        screen.blit(heart_image, (i * 30 + 5, 150))
+
+    draw_label("Uniform Circular Motion", 20, 20)
+    draw_label("Non-uniform Circular Motion", 530, 20)
 
     # Draw output boxes
     for output_box in output_boxes:
@@ -739,16 +831,15 @@ while running:
 
     # If game over, display a game over message
     if game_over:
-        font = pygame.font.Font(None, 48)
-        text = font.render('Game Over', True, (255, 0, 0))
-        screen.blit(text, (250, 150))
+        display_game_over_page()
+    
 
     # Update the display
     pygame.display.flip()
     frame_count += 1
 
     # Cap the frame rate
-    clock.tick(60)
+    clock.tick(75)
 
 pygame.quit()
 
