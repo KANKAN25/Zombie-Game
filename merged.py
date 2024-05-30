@@ -4,6 +4,12 @@ import random
 
 # Initialize Pygame
 pygame.init()
+pygame.mixer.init()
+
+# Load and play the background music
+pygame.mixer.music.load("omg.mp3")  # Replace with your music file
+pygame.mixer.music.set_volume(0.5)  # Set the volume (0.0 to 1.0)
+pygame.mixer.music.play(-1)  # -1 means the music will loop indefinitely
 
 # Set up the display
 WIDTH, HEIGHT = 800, 600
@@ -349,7 +355,7 @@ level = 1
 base_num_zombies = 5  # Base number of zombies
 zombies = create_wave(base_num_zombies * level, zombie_images, zombie2_images, zombie4_images, zombie3_images)
 
-# Main game loop
+# Main 
 running = True
 clock = pygame.time.Clock()
 angle = 0
