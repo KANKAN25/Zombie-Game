@@ -422,14 +422,12 @@ character_image = direction_images["stationary"]
 COLUMN_WIDTH = WIDTH // 3
 
 # Create and position sliders
-radius_slider = Slider(COLUMN_WIDTH + 17, 40, 200, 10, 200, default_radius, "Radius:")
-speed_slider = Slider(COLUMN_WIDTH + 17, 80, 200, 0.01, 0.2, default_speed, "Speed:")
-weight_slider = Slider(COLUMN_WIDTH + 17, 120, 200, 0.5, 5.0, default_weight, "Weight (kg):")
+radius_slider = Slider(COLUMN_WIDTH + 17, 40, 200, 10, 200, default_radius, "Radius (m):")
+speed_slider = Slider(COLUMN_WIDTH + 17, 80, 200, 0.01, 0.2, default_speed, "Tangential Velocity (m/s): ")
+weight_slider = Slider(COLUMN_WIDTH + 17, 120, 200, 0.5, 5.0, default_weight, "Mass (kg):")
 
 
 sliders = [radius_slider, speed_slider, weight_slider]
-
-
 
 
 # Define initial position and size of the character's rect
@@ -639,8 +637,8 @@ def display_winning_page():
     win1_img = pygame.transform.scale(win1_img, (WIDTH, HEIGHT))
     win2_img = pygame.transform.scale(win2_img, (WIDTH, HEIGHT))
 
-    screen.blit(win1_img, (0, 0))
     screen.blit(win2_img, (0, 0))
+    screen.blit(win1_img, (0, 100))
 
     pygame.display.update()
     pygame.time.wait(3000)  # Display for 3 seconds
