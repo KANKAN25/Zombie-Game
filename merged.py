@@ -532,6 +532,51 @@ def bounce_away():
     # Bounce the character
     character_rect.x += int(dx * bounce_distance)
     character_rect.y += int(dy * bounce_distance)
+# Colors
+BLACK = (0, 0, 0)
+
+def eye_closing_transition(duration):
+    half_duration = duration // 1
+    num_steps = 510  # Number of steps for animation
+    step_delay = half_duration // num_steps
+
+    # Calculate the height of the closing bars
+    bar_height = HEIGHT // 2
+    bar_speed = bar_height / half_duration
+
+    # Take a screenshot of the current screen
+    current_screen = screen.copy()
+
+    # Move bars from top and bottom to the middle
+    for step in range(num_steps):
+        screen.blit(current_screen, (0, 0))
+        pygame.draw.rect(screen, BLACK, (0, 0, WIDTH, int(step * bar_speed)))
+        pygame.draw.rect(screen, BLACK, (0, HEIGHT - int(step * bar_speed), WIDTH, int(step * bar_speed)))
+        pygame.display.update()
+        pygame.time.delay(step_delay)  # Adjust the delay
+
+    # Keep bars in the middle for a moment
+    pygame.time.delay(200)
+
+# def eye_opening_transition(duration):
+#     num_steps = 255  # Number of steps for animation
+#     step_delay = duration // num_steps
+
+#     # Create a mask surface
+#     mask_surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+
+#     # Calculate the height of the opening bars
+#     bar_height = HEIGHT // 2
+
+#     # Move bars from the middle to top and bottom
+#     for alpha in range(255, 0, -1):  # Decrease alpha gradually from 255 to 0
+#         mask_surface.fill((0, 0, 0, 0))  # Clear the mask
+#         pygame.draw.rect(mask_surface, (0, 0, 0, alpha), (0, 0, WIDTH, bar_height))  # Draw top bar
+#         pygame.draw.rect(mask_surface, (0, 0, 0, alpha), (0, HEIGHT - bar_height, WIDTH, bar_height))  # Draw bottom bar
+
+#         screen.blit(mask_surface, (0, 0))  # Position the mask at the top-left corner of the screen
+#         pygame.display.update()
+#         pygame.time.delay(step_delay)  # Adjust the delay
 
 def main_menu():
     # Load images
@@ -540,27 +585,50 @@ def main_menu():
     quit_img = pygame.image.load('quit.png').convert_alpha()
 
     menu_img = pygame.transform.scale(menu_img, (WIDTH, HEIGHT))
-    play_img = pygame.transform.scale(play_img, (200, 80))
-    quit_img = pygame.transform.scale(quit_img, (200, 80))
+    play_img = pygame.transform.scale(play_img, (300, 160))
+    quit_img = pygame.transform.scale(quit_img, (300, 160))
 
-    play_rect = play_img.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
-    quit_rect = quit_img.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
+    play_rect = play_img.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 20))
+    quit_rect = quit_img.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
+
+    hover_scale = 1.1  # Scale factor for hover effect
 
     while True:
         screen.blit(menu_img, (0, 0))
-        screen.blit(play_img, play_rect)
-        screen.blit(quit_img, quit_rect)
+
+        mouse_pos = pygame.mouse.get_pos()
+        
+        # Check if mouse is over the play button
+        if play_rect.collidepoint(mouse_pos):
+            play_img_hover = pygame.transform.scale(play_img, 
+                (int(300 * hover_scale), int(160 * hover_scale)))
+            play_rect_hover = play_img_hover.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 20))
+            screen.blit(play_img_hover, play_rect_hover)
+        else:
+            screen.blit(play_img, play_rect)
+
+        # Check if mouse is over the quit button
+        if quit_rect.collidepoint(mouse_pos):
+            quit_img_hover = pygame.transform.scale(quit_img, 
+                (int(300 * hover_scale), int(160 * hover_scale)))
+            quit_rect_hover = quit_img_hover.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 100))
+            screen.blit(quit_img_hover, quit_rect_hover)
+        else:
+            screen.blit(quit_img, quit_rect)
 
         pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                eye_closing_transition(500) 
                 pygame.quit()
                 quit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if play_rect.collidepoint(event.pos):
+                    eye_closing_transition(500)
                     return  # Start the game
                 if quit_rect.collidepoint(event.pos):
+                    eye_closing_transition(500) 
                     pygame.quit()
                     quit()
 
@@ -576,8 +644,8 @@ def display_winning_page():
 
     pygame.display.update()
     pygame.time.wait(3000)  # Display for 3 seconds
-
-game_won = False 
+    eye_closing_transition(500)  # Close eyes to transition in
+    pygame.quit()
 
 def display_game_over_page():
     gameover_img = pygame.image.load('gameover.png').convert_alpha()
@@ -588,6 +656,10 @@ def display_game_over_page():
 
     pygame.display.update()
     pygame.time.wait(3000)  # Display for 3 seconds
+    eye_closing_transition(500)  # Close eyes to transition in
+    pygame.quit()
+
+game_won = False 
 
 main_menu()
 # Main game loop
@@ -831,6 +903,7 @@ while running:
 
     # If game over, display a game over message
     if game_over:
+        eye_closing_transition(500)
         display_game_over_page()
     
 
